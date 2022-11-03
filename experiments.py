@@ -1,10 +1,8 @@
-import pandas as pd,numpy as np,scanpy as sc,
+import pandas as pd,numpy as np,scanpy as sc
 import jscatter,scipy
 
-def interactive_scatter(adata, var_list=[], embedding_list=['X_umap'], nrows= 2
+def interactive_scatter_list(adata, var_list=[], embedding_list=['X_umap'], 
                        ):
-    nrows= min(nrows, len(var_list))
-    
     gene_list = pd.Series([v for v in var_list if v in adata.var_names])
     mat = adata[:,gene_list].X
     import scipy
@@ -33,7 +31,11 @@ def interactive_scatter(adata, var_list=[], embedding_list=['X_umap'], nrows= 2
         else:
             sca.color(by=var_name) #TODO: color configs palette 
         list_of_scatters.append(sca)
-        
-    result=jscatter.link(list_of_scatters, rows=nrows)
     
-    return result
+    return list_of_scatters
+    
+lst = interactive_scatter_list(adata, 
+                         var_list=['Cd3d'], 
+                         embedding_list=['X_umap-t4.0-L1.0'])
+                         
+jscatter.link(lst, rows=1)
