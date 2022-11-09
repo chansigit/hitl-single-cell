@@ -3,16 +3,19 @@ import jscatter,scipy
 
 def interactive_scatter_list(adata, var_list=[], embedding_list=['X_umap'], 
                        ):
-    gene_list = pd.Series([v for v in var_list if v in adata.var_names])
-    mat = adata[:,gene_list].X
+    _var_list       = np.unique(var_list)
+    _embedding_list = np.unique(embedding_list)
+    
+    _var_list = pd.Series([v for v in _var_list if v in adata.var_names])
+    mat = adata[:,_var_list].X
     import scipy
     if scipy.sparse.issparse(mat): mat= mat.todense();
     expr_df   = pd.DataFrame(mat, 
                              index = adata.obs_names, 
-                             columns="_expr_"+gene_list)
+                             columns="_expr_"+_var_list)
     
     list_of_df = []
-    for emb_name in embedding_list:
+    for emb_name in _embedding_list:
         df = pd.DataFrame(adata.obsm[emb_name][:,:2],columns=[emb_name+".1", emb_name+".2"])
         list_of_df.append(df)
     emb_df = pd.concat(list_of_df, axis=1)
@@ -33,9 +36,12 @@ def interactive_scatter_list(adata, var_list=[], embedding_list=['X_umap'],
         list_of_scatters.append(sca)
     
     return list_of_scatters
-    
+  
+# draw interactive plots
 lst = interactive_scatter_list(adata, 
-                         var_list=['Cd3d'], 
-                         embedding_list=['X_umap-t4.0-L1.0'])
-                         
+                         var_list=['Cd3d','ann220413' ], 
+                         embedding_list=['X_umap-t4.0-L1.0','X_umap-t4.0-L1.0'])
 jscatter.link(lst, rows=1)
+
+# get selected cells
+lst[0].selection()
